@@ -1,0 +1,14 @@
+[logger]
+
+# Level of logging for Streamlit's internal logger: "error", "warning",
+# "info", or "debug".
+#
+# Default: "info"
+level = "info"
+messageFormat = "%(asctime)s %(message)s"
+
+[server]
+# Max size, in megabytes, for files uploaded with the file_uploader.
+#
+# Default: 200
+maxUploadSize = 1
