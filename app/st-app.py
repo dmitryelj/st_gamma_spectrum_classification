@@ -5,12 +5,20 @@ import streamlit as st
 import matplotlib.pyplot as plt
 from PIL import Image
 from io import StringIO
+import os
 from typing import Optional
 from spectrum import SpectrumPreprocessing
 from models import SpectrumData, Spectrum
 from ml_models import IsotopesClassificationModel
 import logging
 logger = logging.getLogger(__name__)
+
+
+def get_page_icon() -> Image:
+    """ Get app icon """
+    path = os.path.dirname(os.path.abspath(__file__))
+    logger.info(f"Local path: {path}")
+    return Image.open(path + "/static/favicon.ico")
 
 
 def is_xml_valid(xml_data: str) -> bool:
@@ -51,7 +59,7 @@ def get_spectrum_barchart(sp: Spectrum) -> plt.Figure:
 def main():
     logger.info("App started")
     st.set_page_config(
-        page_title='Gamma Spectrum', page_icon = Image.open("static/favicon.ico")
+        page_title='Gamma Spectrum', page_icon=get_page_icon()
     )
     st.title("Radiacode Spectrum Detection (Beta)")
     st.text(
