@@ -41,7 +41,7 @@ class SpectrumPreprocessing:
     @staticmethod
     def _smooth_data(data: List | np.array) -> np.array:
         """ Apply 1D smoothing filter to the data array """
-        window_size = 20
+        window_size = 10
         data_out = savgol_filter(
             data,
             window_length=window_size,
