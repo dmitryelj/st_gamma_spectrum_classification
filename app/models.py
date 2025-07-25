@@ -2,11 +2,23 @@
 
 
 from dataclasses import dataclass
-from radiacode import Spectrum
+import datetime
+
+
+@dataclass
+class Spectrum:
+    """ Radiation spectrum data """
+
+    duration: datetime.timedelta
+    a0: float
+    a1: float
+    a2: float
+    counts: list[int]
 
 
 @dataclass
 class SpectrumData:
+    """ Spectrum data wrapper """
     spectrum: Spectrum
 
     def get_duration(self) -> float:

@@ -1,5 +1,4 @@
 xgboost==3.0.2
-radiacode==0.3.5
 scikit-learn==1.6.1
 numpy==1.26.4
 streamlit==1.47.0

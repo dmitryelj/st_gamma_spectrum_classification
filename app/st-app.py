@@ -7,8 +7,7 @@ from PIL import Image
 from io import StringIO
 from typing import Optional
 from spectrum import SpectrumPreprocessing
-from radiacode import Spectrum
-from models import SpectrumData
+from models import SpectrumData, Spectrum
 from ml_models import IsotopesClassificationModel
 import logging
 logger = logging.getLogger(__name__)

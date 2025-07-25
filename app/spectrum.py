@@ -4,10 +4,9 @@
 import datetime
 import json
 import xmltodict
-from dataclasses import dataclass
-from typing import Optional, List
+from typing import List
 import numpy as np
-from radiacode import Spectrum
+from models import Spectrum
 from scipy.signal import savgol_filter
 
 
