@@ -13,5 +13,5 @@ messageFormat = "%(asctime)s %(message)s"
 # Default: 200
 maxUploadSize = 1
 
-enableStaticServing = true
+enableStaticServing = false
 
