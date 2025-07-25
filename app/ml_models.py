@@ -4,6 +4,7 @@
 import logging
 import json
 import numpy as np
+import os
 from typing import List
 from xgboost import XGBClassifier
 from sklearn.preprocessing import LabelEncoder
@@ -18,7 +19,8 @@ class IsotopesClassificationModel:
     MIN_SPECTRUM_DURATION_SEC = 30
 
     def __init__(self):
-        path = f"../models/{self.VERSION}"
+        """ Load models """
+        path = self._get_models_path()
         self._classifier = self._load_model(path + "/XGBClassifier.json")
         self._isotopes = self._load_isotopes(path + "/isotopes.json")
         self._labels_encoder = self._load_labels_encoder(path + "/LabelEncoder.npy")
@@ -51,3 +53,9 @@ class IsotopesClassificationModel:
         le = LabelEncoder()
         le.classes_ = np.load(filename)
         return le
+
+    @staticmethod
+    def _get_models_path() -> str:
+        """ Get path to models """
+        parent_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        return parent_dir + f"/models/{IsotopesClassificationModel.VERSION}"
