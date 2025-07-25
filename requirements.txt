@@ -3,3 +3,4 @@ scikit-learn==1.6.1
 numpy==1.26.4
 streamlit==1.47.0
 pillow==11.1.0
+matplotlib==3.10.3
