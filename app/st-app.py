@@ -5,6 +5,7 @@ import streamlit as st
 import matplotlib.pyplot as plt
 from PIL import Image
 from io import StringIO
+from typing import Optional
 from spectrum import SpectrumPreprocessing
 from radiacode import Spectrum
 from models import SpectrumData
@@ -13,7 +14,20 @@ import logging
 logger = logging.getLogger(__name__)
 
 
-def get_spectrum_barchart_figure(sp: Spectrum) -> plt.Figure:
+def is_xml_valid(xml_data: str) -> bool:
+    """ Check if the XML has valid size and data """
+    return len(xml_data) < 65535 and xml_data.startswith("<?xml")
+
+
+def get_spectrum(stringio: StringIO) -> Optional[Spectrum]:
+    """ Load spectrum from the StringIO stream """
+    xml_data = stringio.read()
+    if is_xml_valid(xml_data):
+        return SpectrumPreprocessing.load_from_xml(xml_data)
+    return None
+
+
+def get_spectrum_barchart(sp: Spectrum) -> plt.Figure:
     """ Get Matplotlib's barchart """
     counts = SpectrumPreprocessing.get_counts(sp)
     energy = [SpectrumPreprocessing.channel_to_energy(sp, x) for x in range(len(counts))]
@@ -35,11 +49,6 @@ def get_spectrum_barchart_figure(sp: Spectrum) -> plt.Figure:
     return fig
 
 
-def is_xml_valid(xml_data: str) -> bool:
-    """ Check if the XML has valid size and data """
-    return len(xml_data) < 65535 and xml_data.startswith("<?xml")
-
-
 def main():
     logger.info("App started")
     st.set_page_config(
@@ -51,22 +60,36 @@ def main():
         "upload it to see the results."
     )
     st.text(
-        "A model was trained on sources, available in homes (radium, thorium, "
-        "uranium and americium). Logs will be analysed to improve the model."
+        "V1: A model was trained on sources, available in homes (radium, thorium, "
+        "uranium and americium).\nFeel free to test other sources (please add description), "
+        "logs will be analysed to improve the model."
+    )
+    st.text_input(
+        "Enter object description (optional):", "", key="object_description"
     )
 
-    description = st.text_input("Enter object description (optional):", "")
-
-    uploaded_file = st.file_uploader("Choose the XML file", type="xml")
-    if uploaded_file is not None:
-        stringio = StringIO(uploaded_file.getvalue().decode("utf-8"))
-        xml_data = stringio.read()
-        if is_xml_valid(xml_data):
-            # Load
-            sp = SpectrumPreprocessing.load_from_xml(xml_data)
+    def on_file_uploader_changed():
+        """ If the file was already uploaded, clear the object description """
+        # Save spectrum to log
+        uploader = st.session_state['uploader']
+        stringio = StringIO(uploader.getvalue().decode("utf-8"))
+        if sp := get_spectrum(stringio):
+            # Add description
+            description = st.session_state["object_description"]
             sp_str = SpectrumPreprocessing.to_string(sp)
             logger.info(f"Spectrum file loaded: '{description}';{sp_str}")
 
+        # Clear description for a next use
+        st.session_state["object_description"] = ""
+
+
+    uploaded_file = st.file_uploader(
+        "Choose the XML file", type="xml", key="uploader", on_change=on_file_uploader_changed
+    )
+    if uploaded_file is not None:
+        stringio = StringIO(uploaded_file.getvalue().decode("utf-8"))
+        # Load from uploaded file
+        if sp := get_spectrum(stringio):
             # Prediction
             model = IsotopesClassificationModel()
             result = model.predict(SpectrumData(sp))
@@ -74,8 +97,8 @@ def main():
 
             # Show result
             st.success(f"Prediction Result: {result}")
-            # Draw spectrum
-            fig = get_spectrum_barchart_figure(sp)
+            # Draw
+            fig = get_spectrum_barchart(sp)
             st.pyplot(fig)
 
 
